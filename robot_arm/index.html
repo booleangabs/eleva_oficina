@@ -1,0 +1,98 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Braço Robótico</title>
+<style>
+:root{--bg:#eef6ff;--pn:#fff;--tx:#12324f;--ac:#ff7a1a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f1b2a;--pn:#1b2b40;--tx:#e8f1fb}}
+:root[data-theme=dark]{--bg:#0f1b2a;--pn:#1b2b40;--tx:#e8f1fb}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+nav{display:flex;gap:6px;padding:8px}nav .b{flex:1;font-size:1.1rem}
+#st{flex:1;min-height:0;position:relative}
+canvas{width:100%;height:100%;display:block;touch-action:none}
+#cap{position:absolute;left:8px;right:8px;top:4px;background:var(--pn);padding:8px 12px;border-radius:14px;font-size:1.1rem;font-weight:600;min-height:1.4em}
+#pn{background:var(--pn);padding:10px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;border-radius:20px 20px 0 0}
+.b{min-width:64px;min-height:60px;font-size:1.6rem;border:0;border-radius:16px;background:var(--bg);color:var(--tx);box-shadow:0 2px 0 #0002;padding:4px 10px;touch-action:none;font-family:inherit}
+.b small{display:block;font-size:.7rem}
+.on{outline:4px solid var(--ac)}.off{opacity:.35;pointer-events:none}
+.pulse{animation:p 1s infinite}@keyframes p{50%{transform:scale(1.12)}}
+.shake{animation:s .3s}@keyframes s{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+#tr{width:100%;display:flex;flex-wrap:wrap;gap:6px;min-height:64px;background:var(--bg);border-radius:14px;padding:6px;box-sizing:border-box}
+#tr:empty::before{content:"Toque nos blocos ⬇️ para montar o programa";opacity:.6;font-size:.9rem;padding:8px}
+.w{width:100%;text-align:center;font-weight:600}.w label{margin:0 10px;display:inline-block}input[type=range]{width:34vw;min-width:120px;height:36px;vertical-align:middle}
+</style></head><body>
+<nav><button class="b" data-m="build">🔧<small>1 Montar</small></button><button class="b off" data-m="ctl">🕹️<small>2 Controlar</small></button><button class="b off" data-m="prog">🧩<small>3 Programar</small></button><button class="b" id="rs">↺</button></nav>
+<div id="st"><canvas id="cv"></canvas><div id="cap"></div></div>
+<div id="pn"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+let L1=1.4,LF=1.3;const H=.7,R=1.7,D=Math.PI/180,$=s=>document.querySelector(s);
+const S={yaw:0,a1:0,a2:0,g:0};
+function ik(x,y){const dy=y-H,c=(x*x+dy*dy-L1*L1-LF*LF)/(2*L1*LF),a2=Math.acos(Math.max(-1,Math.min(1,c)));return{a1:Math.atan2(x,dy)-Math.atan2(LF*Math.sin(a2),L1+LF*Math.cos(a2)),a2}}
+let UP,DN,HOME,DROP,vert=1;const wr=(x,y)=>vert?ik(x,y+.3):ik(x-.3,y);
+function poses(){UP=wr(R,1.5);DN=wr(R,.2);DROP=wr(R,.6);HOME=ik(1,2)}
+const ren=new THREE.WebGLRenderer({canvas:$('#cv'),antialias:true,alpha:true});
+const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(45,1,.1,50);
+sc.add(new THREE.HemisphereLight(0xffffff,0x8899aa,.9));
+const dl=new THREE.DirectionalLight(0xffffff,.8);dl.position.set(4,8,5);sc.add(dl);
+const mat=c=>new THREE.MeshStandardMaterial({color:c,roughness:.5});
+const fl=new THREE.Mesh(new THREE.CircleGeometry(4.2,48),mat(0xdfe8f2));fl.rotation.x=-Math.PI/2;sc.add(fl);
+const P={},yawG=new THREE.Group(),shG=new THREE.Group(),elG=new THREE.Group(),wG=new THREE.Group(),gpG=new THREE.Group();
+yawG.position.y=H;sc.add(yawG);yawG.add(shG);shG.add(elG);elG.add(wG);wG.add(gpG);
+const cyl=(r,h)=>new THREE.CylinderGeometry(r,r,h,24),sph=r=>new THREE.SphereGeometry(r,24,16),bx=(a,b,c)=>new THREE.BoxGeometry(a,b,c);
+function add(p,par,geo,c,x=0,y=0){const m=new THREE.Mesh(geo,mat(c));m.position.set(x,y,0);par.add(m);(P[p]=P[p]||[]).push(m);m.visible=false}
+add('base',sc,cyl(.6,H-.2),0xff7a1a,0,(H-.2)/2);add('base',yawG,cyl(.45,.2),0xff9d4d,0,-.1);
+add('shoulder',shG,sph(.3),0xffc21a);add('arm',shG,bx(.28,1,.28),0x2f80ed,0,.5);
+add('elbow',elG,sph(.26),0xffc21a);add('fore',elG,bx(.24,1,.24),0x56a0ff,0,.5);
+add('grip',gpG,bx(.5,.14,.2),0xe63946,0,0);add('grip',gpG,bx(.08,.4,.16),0xe63946,-.2,.2);add('grip',gpG,bx(.08,.4,.16),0xe63946,.2,.2);
+const tip=new THREE.Object3D();tip.position.y=.3;gpG.add(tip);
+function dims(){P.arm[0].scale.y=L1;P.arm[0].position.y=L1/2;elG.position.y=L1;P.fore[0].scale.y=LF;P.fore[0].position.y=LF/2;wG.position.y=LF;poses()}
+const pos=(d,r=R)=>new THREE.Vector3(r*Math.cos(d*D),0,-r*Math.sin(d*D));
+const tray=new THREE.Group();tray.position.copy(pos(60));sc.add(tray);
+[[0,0,1.1,.05,1.1],[.55,.05,.05,.15,1.1],[-.55,.05,.05,.15,1.1],[0,.05,1.1,.15,.05,.55],[0,.05,1.1,.15,.05,-.55]].forEach(a=>{const m=new THREE.Mesh(bx(a[2],a[3],a[4]),mat(0x22a55b));m.position.set(a[0],a[1]+a[3]/2,a[5]||0);tray.add(m)});
+const cubes=[[-60,0xe63946],[-30,0xffc21a],[0,0x9b5de5]].map(([d,c])=>{const m=new THREE.Mesh(bx(.3,.3,.3),mat(c));m.userData.d=d;sc.add(m);return m});
+let held=null,stop=false,running=false,cur=-1,mode='build',built=0,az=.7;
+function apply(){yawG.rotation.y=S.yaw*D;shG.rotation.z=-S.a1;elG.rotation.z=-S.a2;wG.rotation.z=S.a1+S.a2-(vert?Math.PI:Math.PI/2);gpG.rotation.y=vert?0:Math.PI/2;P.grip.forEach((m,i)=>{if(i)m.position.x=(i==1?-1:1)*(.32-.13*S.g)})}
+const tipY=()=>H+L1*Math.cos(S.a1)+LF*Math.cos(S.a1+S.a2)-(vert?.3:0);
+function resetScene(){stop=true;held=null;cubes.forEach(c=>{sc.attach(c);c.rotation.set(0,0,0);c.position.copy(pos(c.userData.d)).setY(.15)});Object.assign(S,HOME,{yaw:0,g:0});apply();say(mode=='build'?'Toque na peça que está piscando! ✨':'Cena reiniciada')}
+const say=t=>$('#cap').textContent=t;
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+function go(t,ms=600){return new Promise(r=>{const f={...S},t0=performance.now();(function s(n){const k=Math.min(1,(n-t0)/ms),e=ease(k);for(const q in t)S[q]=f[q]+(t[q]-f[q])*e;apply();k<1&&!stop?requestAnimationFrame(s):r()})(t0)})}
+function check(){const n=cubes.filter(c=>c!==held&&Math.hypot(c.position.x-tray.position.x,c.position.z-tray.position.z)<.55).length;if(n==3)say('🎉 Missão cumprida! Os 3 cubos estão na caixa!')}
+function drop(c){let v=0;(function s(){v+=.01;c.position.y=Math.max(.15,c.position.y-v);c.position.y>.15?requestAnimationFrame(s):check()})()}
+function grip(cl){return go({g:cl?1:0},350).then(()=>{if(cl&&!held){const p=new THREE.Vector3();tip.getWorldPosition(p);let b=null,d=.45;cubes.forEach(c=>{const q=c.getWorldPosition(new THREE.Vector3()).distanceTo(p);if(q<d){d=q;b=c}});if(b){held=b;gpG.attach(b)}}if(!cl&&held){const c=held;held=null;sc.attach(c);c.rotation.set(0,0,0);drop(c)}})}
+const ops={L:()=>go({yaw:S.yaw+30}),R:()=>go({yaw:S.yaw-30}),D:()=>go(DN),U:()=>go(UP),C:()=>grip(1),O:()=>grip(0),H:()=>go({...HOME,yaw:S.yaw+dy(0)}),P:async()=>{await go({...UP,yaw:S.yaw+dy(60)});await go(DROP);await grip(0);await go(UP)}};
+const dy=a=>((a-S.yaw)%360+540)%360-180;
+const ic={L:'↶',R:'↷',D:'⬇️',U:'⬆️',C:'✊',O:'✋',H:'🏠',P:'📥'};
+const info={base:['🟧','Base','segura o robô firme e faz ele girar.'],shoulder:['⚙️','Ombro','levanta e abaixa o braço todo.'],arm:['📏','Braço','dá alcance ao robô.'],elbow:['🔩','Cotovelo','dobra o braço no meio.'],fore:['🦾','Antebraço','leva a garra até o objeto.'],grip:['🤏','Garra','abre e fecha para pegar coisas.']};
+const need=Object.keys(info),order=[...need].sort(()=>Math.random()-.5);let bi=0;
+const pn=$('#pn');
+function mk(h,fn,c=''){const b=document.createElement('button');b.className='b '+c;b.innerHTML=h;if(fn)b.onclick=fn;pn.appendChild(b);return b}
+function hold(h,k,d){const b=mk(h);let on=0;const t=()=>{if(!on)return;const o=S[k];S[k]=k=='yaw'?o+d:Math.min(k=='a1'?1.9:2.5,Math.max(k=='a1'?-.5:-.2,o+d));if(k!='yaw'&&tipY()<.12)S[k]=o;apply();requestAnimationFrame(t)};b.onpointerdown=()=>{on=1;t()};b.onpointerup=b.onpointerleave=b.onpointercancel=()=>on=0}
+function show(m){mode=m;pn.innerHTML='';document.querySelectorAll('nav [data-m]').forEach(b=>{b.classList.toggle('on',b.dataset.m==m);if(built)b.classList.remove('off')});
+if(m=='build')buildUI();else if(m=='ctl')ctlUI();else progUI()}
+function buildUI(){order.forEach(k=>{const done=need.indexOf(k)<bi,b=mk(info[k][0]+'<small>'+info[k][1]+'</small>',null,done?'off':k==need[bi]?'pulse':'');b.onclick=()=>{if(k==need[bi]){P[k].forEach(m=>m.visible=true);say(info[k][1]+': '+info[k][2]);bi++;if(bi==6){built=1;say('🎉 Robô montado! Agora vamos controlar.')}show('build')}else{say('Ainda não! Procure a peça que está piscando.');b.classList.add('shake');setTimeout(()=>b.classList.remove('shake'),300)}}});
+if(bi<6)mk('⏩<small>Pular</small>',()=>{need.forEach(k=>P[k].forEach(m=>m.visible=true));bi=6;built=1;show('ctl')});else mk('➡️<small>Controlar</small>',()=>show('ctl'));setUI()}
+function setUI(){const d=document.createElement('div');d.className='w';d.innerHTML='<label>📏 Braço <input type=range min=1.2 max=1.7 step=.05 value='+L1+' id=s1></label><label>📐 Antebraço <input type=range min=1.1 max=1.6 step=.05 value='+LF+' id=s2></label>';pn.appendChild(d);
+const up=()=>{dims();Object.assign(S,HOME);apply()};$('#s1').oninput=e=>{L1=+e.target.value;up()};$('#s2').oninput=e=>{LF=+e.target.value;up()};
+mk('🤏⬇️<small>Garra vertical</small>',()=>{vert=1;poses();Object.assign(S,HOME);apply();show('build')},vert?'on':'');mk('🤏➡️<small>Garra horizontal</small>',()=>{vert=0;poses();Object.assign(S,HOME);apply();show('build')},vert?'':'on')}
+function ctlUI(){say('Segure os botões para mexer no robô. Pegue um cubo!');
+hold('↶<small>Base</small>','yaw',1.5);hold('↷<small>Base</small>','yaw',-1.5);hold('⬆️<small>Ombro</small>','a1',-.02);hold('⬇️<small>Ombro</small>','a1',.02);hold('⬆️<small>Cotovelo</small>','a2',-.03);hold('⬇️<small>Cotovelo</small>','a2',.03);
+mk('✊<small>Fechar</small>',()=>grip(1));mk('✋<small>Abrir</small>',()=>grip(0));mk('🏠<small>Home</small>',()=>ops.H());mk('📥<small>Caixa</small>',()=>ops.P())}
+let prog=[];
+function rt(){const t=$('#tr');if(!t)return;t.innerHTML='';prog.forEach((b,i)=>{const c=document.createElement('button');c.className='b'+(i==cur?' on':'');c.innerHTML=b.k=='r'?'🔁'+b.n:b.k=='e'?'🔚':ic[b.k];c.onclick=()=>{if(!running){prog.splice(i,1);rt()}};t.appendChild(c)})}
+function progUI(){say('Missão: leve os 3 cubos para a caixa verde!');
+const t=document.createElement('div');t.id='tr';pn.appendChild(t);
+[['L','Esq.'],['R','Dir.'],['D','Descer'],['U','Subir'],['C','Fechar'],['O','Abrir'],['H','Home'],['P','Caixa']].forEach(([k,l])=>mk(ic[k]+'<small>'+l+'</small>',()=>{prog.push({k});rt()}));
+[2,3,4].forEach(n=>mk('🔁'+n+'<small>Repetir</small>',()=>{prog.push({k:'r',n});rt()}));mk('🔚<small>Fim</small>',()=>{prog.push({k:'e'});rt()});
+mk('▶️<small>Executar</small>',run,'pulse');mk('⏹<small>Parar</small>',()=>stop=true);mk('🗑<small>Limpar</small>',()=>{if(!running){prog=[];rt()}});rt()}
+function expand(){const st=[{a:[],n:1}],pop=()=>{const t=st.pop();for(let j=0;j<t.n;j++)st[st.length-1].a.push(...t.a)};prog.forEach((b,i)=>{if(b.k=='r')st.push({a:[],n:b.n});else if(b.k=='e'){if(st.length>1)pop()}else st[st.length-1].a.push({o:b.k,i})});while(st.length>1)pop();return st[0].a.slice(0,400)}
+async function run(){if(running)return;running=true;stop=false;for(const s of expand()){if(stop)break;cur=s.i;rt();await ops[s.o]()}cur=-1;rt();running=false}
+document.querySelectorAll('nav [data-m]').forEach(b=>b.onclick=()=>{if(!running)show(b.dataset.m)});
+$('#rs').onclick=()=>{if(!running){resetScene()}};
+let dx=null;const cv=$('#cv');cv.onpointerdown=e=>dx=e.clientX;cv.onpointermove=e=>{if(dx!=null){az-=(e.clientX-dx)*.01;dx=e.clientX}};cv.onpointerup=cv.onpointerleave=()=>dx=null;
+function size(){const w=$('#st').clientWidth,h=$('#st').clientHeight;ren.setPixelRatio(Math.min(2,devicePixelRatio));ren.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}
+new ResizeObserver(size).observe($('#st'));size();
+(function loop(){const d=cam.aspect<1?12:8.5;cam.position.set(Math.sin(az)*d,4.8,Math.cos(az)*d);cam.lookAt(0,1.1,0);ren.render(sc,cam);requestAnimationFrame(loop)})();
+dims();resetScene();stop=false;show('build');say('Toque na peça que está piscando! ✨ (arraste a cena para girar a câmera)');
+</script></body></html>
