@@ -2,7 +2,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Conversando com a IA</title>
 <style>
-:root{--bg:#eef6ff;--pn:#fff;--tx:#12324f;--a:#2f80ed;--ok:#22a55b;--bad:#e63946;box-sizing:border-box;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+:root{--bg:#eef6ff;--pn:#fff;--tx:#12324f;--a:#2f80ed;--bad:#e63946;box-sizing:border-box;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f1b2a;--pn:#1b2b40;--tx:#e8f1fb}}
 :root[data-theme=dark]{--bg:#0f1b2a;--pn:#1b2b40;--tx:#e8f1fb}
 body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
@@ -10,69 +10,63 @@ nav{position:sticky;top:0;background:var(--pn);display:flex;gap:6px;padding:8px;
 nav a{white-space:nowrap;padding:10px 14px;border-radius:12px;background:var(--bg);color:var(--tx);text-decoration:none;font-weight:600}
 main{max-width:860px;margin:auto;padding:12px}
 section{background:var(--pn);border-radius:20px;padding:16px;margin:14px 0}
-h2{margin:0 0 8px}small{opacity:.75}
-label{display:block;font-weight:600;margin-top:10px}
-input,textarea{width:100%;box-sizing:border-box;font:inherit;padding:10px;border-radius:12px;border:2px solid #8aa;background:var(--bg);color:var(--tx)}
-textarea{min-height:64px}
-.b{font:inherit;font-weight:700;border:0;border-radius:14px;padding:12px 16px;background:var(--a);color:#fff;margin:4px 4px 0 0;cursor:pointer}
-.b.s{background:var(--bg);color:var(--tx);box-shadow:0 0 0 2px #8aa inset}
-.c{display:inline-block;margin:4px 8px 0 0;font-weight:500}.c input{width:auto}
-.cmp{display:flex;flex-wrap:wrap;gap:10px}.cmp>div{flex:1 1 280px;background:var(--bg);border-radius:14px;padding:10px;white-space:pre-wrap;min-height:60px}
-.w{color:var(--bad);font-weight:700}
+h2{margin:0 0 8px}h3{margin:16px 0 4px}
+li{margin:6px 0}
+.cmp{display:flex;flex-wrap:wrap;gap:10px}.cmp>div{flex:1 1 280px;background:var(--bg);border-radius:14px;padding:10px;min-height:60px}
+pre{background:var(--bg);border-radius:14px;padding:12px;white-space:pre-wrap;font:inherit}
 details{background:var(--bg);border-radius:14px;padding:10px;margin:8px 0}summary{font-weight:700;cursor:pointer;font-size:1.1rem}
-@media print{nav,.b{display:none}}
 </style></head><body>
-<nav><a href="../">⬅️ Início</a><a href="#s1">1 Como a IA funciona</a><a href="#s2">2 Monte seu prompt</a><a href="#s3">3 Use com consciência</a><a href="#s4">4 Suas regras</a></nav>
+<nav><a href="../">⬅️ Início</a><a href="#s1">1 Como a IA funciona</a><a href="#s2">2 Guia de prompt</a><a href="#s3">3 Use com consciência</a><a href="#s4">4 Suas regras</a></nav>
 <main>
-<section id="s1"><h2>🧠 1. Como a IA funciona <small>(~10 min)</small></h2>
-<p>A IA de texto funciona como o corretor do celular, só que muito maior: ela <b>prevê a próxima palavra</b> mais provável. Ela não "sabe" fatos como uma pessoa — por isso pode <b>inventar coisas com muita confiança</b>.</p>
+<section id="s1"><h2>🧠 1. Como a IA funciona</h2>
+<p>A IA de texto funciona como o corretor do celular, só que muito maior.</p>
+<ul>
+<li>Ela <b>prevê a próxima palavra</b> mais provável.</li>
+<li>Ela não "sabe" fatos como uma pessoa.</li>
+<li>Por isso pode <b>inventar coisas com muita confiança</b>.</li>
+</ul>
 <p><b>Jogo em dupla:</b> um começa uma frase ("Ontem eu fui à…") e o outro completa com a palavra mais provável. Depois tentem a palavra mais surpreendente. Qual parece mais com uma IA?</p></section>
 
-<section id="s2"><h2>✍️ 2. Monte seu prompt <small>(~20 min)</small></h2>
-<p>Um bom prompt tem 4 partes: <b>Papel</b>, <b>Tarefa</b>, <b>Contexto</b> e <b>Formato</b>. Escolha um desafio ou escreva o seu:</p>
-<div><button class="b s" data-p="0">👶 Explicar para criança de 8 anos</button><button class="b s" data-p="1">📚 Plano de estudos</button><button class="b s" data-p="2">🎭 Reescrever meu texto</button><button class="b s" id="lp">🧹 Limpar</button></div>
-<label for="papel">🎭 Papel — quem a IA deve ser?</label><input id="papel" placeholder="ex.: professor(a) paciente de ciências">
-<label for="tarefa">🎯 Tarefa — o que ela deve fazer?</label><textarea id="tarefa" placeholder="ex.: explique o que é fotossíntese"></textarea>
-<label for="ctx">🧩 Contexto — para quem e por quê?</label><textarea id="ctx" placeholder="ex.: estou no 7º ano e tenho prova amanhã"></textarea>
-<label for="fmt">📐 Formato — como responder?</label><input id="fmt" placeholder="ex.: 3 parágrafos curtos com um exemplo do dia a dia">
-<label>➕ Extras</label>
-<span class="c"><label class="c"><input type="checkbox" value="Explique passo a passo."> passo a passo</label></span>
-<span class="c"><label class="c"><input type="checkbox" value="Dê um exemplo."> com exemplo</label></span>
-<span class="c"><label class="c"><input type="checkbox" value="Se não tiver certeza, diga que não tem certeza."> admitir dúvida</label></span>
-<span class="c"><label class="c"><input type="checkbox" value="Diga como eu posso verificar essa informação."> como verificar</label></span>
+<section id="s2"><h2>✍️ 2. Guia de prompt</h2>
+<p>Um bom prompt tem 4 partes:</p>
+<ul>
+<li>🎭 <b>Papel:</b> quem a IA deve ser? <i>Ex.: professor(a) paciente de ciências.</i></li>
+<li>🎯 <b>Tarefa:</b> o que ela deve fazer? <i>Ex.: explique o que é fotossíntese.</i></li>
+<li>🧩 <b>Contexto:</b> para quem e por quê? <i>Ex.: estou no 7º ano e tenho prova amanhã.</i></li>
+<li>📐 <b>Formato:</b> como responder? <i>Ex.: 3 parágrafos curtos com um exemplo do dia a dia.</i></li>
+</ul>
+<h3>Modelo</h3>
+<pre>Você é [papel].
+[Tarefa]
+Contexto: [para quem e por quê]
+Formato da resposta: [como responder]</pre>
+<h3>Extras que ajudam</h3>
+<ul>
+<li>Explique passo a passo.</li>
+<li>Dê um exemplo.</li>
+<li>Se não tiver certeza, diga que não tem certeza.</li>
+<li>Diga como eu posso verificar essa informação.</li>
+</ul>
 <h3>Comparar</h3>
-<div class="cmp"><div><b>😕 Prompt fraco</b><br><span id="fraco"></span></div><div><b>😎 Prompt melhorado</b><br><span id="forte"></span></div></div>
-<p id="av" class="w"></p>
-<button class="b" id="cp">📋 Copiar prompt melhorado</button><span id="ok"></span>
-<p><small>Cole na IA, veja a resposta e anote: o que mudou em relação ao prompt fraco?</small></p>
-<label for="nota">📝 O que mudou?</label><textarea id="nota"></textarea></section>
+<div class="cmp"><div><b>😕 Prompt fraco</b><br>Explique fotossíntese.</div><div><b>😎 Prompt melhorado</b><br>Você é professor(a) paciente de ciências. Explique fotossíntese. Contexto: estou no 7º ano e tenho prova amanhã. Formato da resposta: 3 parágrafos curtos com um exemplo do dia a dia.</div></div>
+<h3>Desafios</h3>
+<ul>
+<li>👶 Explicar um tema para uma criança de 8 anos.</li>
+<li>📚 Montar um plano de estudos de 5 dias para uma prova.</li>
+<li>🎭 Reescrever um texto seu em tom mais formal.</li>
+</ul>
+<p>Para cada desafio, escreva um prompt fraco e um melhorado, compare as respostas e anote o que mudou.</p></section>
 
-<section id="s3"><h2>🛡️ 3. Use com consciência <small>(~15 min)</small></h2>
+<section id="s3"><h2>🛡️ 3. Use com consciência</h2>
 <details><summary>✅ Verificar</summary><p>A IA pode errar e nem perceber. Peça uma resposta com números ou datas e confira em <b>duas fontes confiáveis</b>. Desafio: ache um erro numa resposta.</p></details>
-<details><summary>🔒 Privacidade</summary><p>Nunca digite nome completo, endereço, telefone, senhas ou fotos suas e de outras pessoas. O gerador acima avisa quando acha algo suspeito.</p></details>
+<details><summary>🔒 Privacidade</summary><p>Nunca digite nome completo, endereço, telefone, senhas ou fotos suas e de outras pessoas.</p></details>
 <details><summary>⚖️ Viés</summary><p>Peça "descreva um cientista" ou "descreva um jogador de futebol". Quem apareceu? Quem ficou de fora? A IA aprende com textos feitos por pessoas, com os preconceitos delas.</p></details>
 <details><summary>🎓 Honestidade</summary><p>Usar a IA para <b>aprender</b> (pedir explicação, exemplos, correção) é diferente de <b>copiar</b> (entregar como seu). Discutam: qual desses casos é honesto? Pedir ideias · pedir a redação pronta · pedir para corrigir minha resposta.</p></details></section>
 
-<section id="s4"><h2>📜 4. Suas regras <small>(~10 min)</small></h2>
-<p>Escrevam 3 regras para usar IA com responsabilidade:</p>
-<input aria-label="Regra 1" placeholder="Regra 1"><br><br><input aria-label="Regra 2" placeholder="Regra 2"><br><br><input aria-label="Regra 3" placeholder="Regra 3">
-<label for="dif">🚪 Uma coisa que vou fazer diferente:</label><textarea id="dif"></textarea>
-<button class="b" onclick="print()">🖨️ Imprimir / salvar</button></section>
+<section id="s4"><h2>📜 4. Suas regras</h2>
+<ul>
+<li>Caso planeje utilizar o que vimos no dia a dia, escrevam 3 regras para usar IA com responsabilidade.</li>
+<li>Bilhete de saída: uma coisa que vou fazer diferente.</li>
+</ul></section>
 </main>
-<script>
-const $=s=>document.querySelector(s),v=id=>$(id).value.trim();
-const PRE=[["professor(a) paciente que explica para uma criança de 8 anos","Explique o que é fotossíntese.","Estou no 7º ano e quero entender para a prova.","3 parágrafos curtos com um exemplo do dia a dia"],
-["orientador(a) de estudos","Monte um plano de estudos de 5 dias para uma prova de matemática.","Tenho 1 hora por dia e mais dificuldade em frações.","tabela com dia, o que estudar e tempo"],
-["revisor(a) de textos gentil","Reescreva o meu texto em tom mais formal: [cole seu texto aqui]","É um trabalho escolar para o professor.","texto reescrito e, depois, uma lista do que mudou"]];
-const F=['#papel','#tarefa','#ctx','#fmt'];
-function gen(){const p=v('#papel'),t=v('#tarefa'),c=v('#ctx'),f=v('#fmt'),x=[...document.querySelectorAll('input[type=checkbox]:checked')].map(i=>i.value);
-$('#fraco').textContent=t||'(escreva a tarefa)';
-const o=[p&&'Você é '+p+'.',t,c&&'Contexto: '+c,f&&'Formato da resposta: '+f,...x].filter(Boolean).join('\n');
-$('#forte').textContent=o||'(preencha os campos)';
-const risco=/\S+@\S+\.\S+|\d[\d\s.-]{7,}\d/.test(o);$('#av').textContent=risco?'⚠️ Parece ter e-mail, telefone ou número pessoal. Tire isso antes de enviar!':'';return o}
-document.querySelectorAll('input,textarea').forEach(e=>e.addEventListener('input',gen));
-document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{PRE[b.dataset.p].forEach((x,i)=>$(F[i]).value=x);gen()});
-$('#lp').onclick=()=>{F.forEach(f=>$(f).value='');document.querySelectorAll('input[type=checkbox]').forEach(i=>i.checked=false);gen()};
-$('#cp').onclick=async()=>{const o=gen();try{await navigator.clipboard.writeText(o);$('#ok').textContent=' ✅ Copiado!'}catch(e){const r=document.createRange();r.selectNodeContents($('#forte'));getSelection().removeAllRanges();getSelection().addRange(r);$('#ok').textContent=' Selecionado: use Copiar do aparelho.'}};
-gen();
-</script></body></html>
+</body></html>

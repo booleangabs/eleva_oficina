@@ -21,10 +21,10 @@ canvas{width:100%;height:100%;display:block;touch-action:none}
 #tr:empty::before{content:"Toque nos blocos ⬇️ para montar o programa";opacity:.6;font-size:.9rem;padding:8px}
 .w{width:100%;text-align:center;font-weight:600}.w label{margin:0 10px;display:inline-block}input[type=range]{width:34vw;min-width:120px;height:36px;vertical-align:middle}
 </style></head><body>
-<nav><button class="b" data-m="build">🔧<small>1 Montar</small></button><button class="b off" data-m="ctl">🕹️<small>2 Controlar</small></button><button class="b off" data-m="prog">🧩<small>3 Programar</small></button><button class="b" id="rs">↺</button></nav>
+<nav><a class="b" href="../" style="text-decoration:none;display:flex;align-items:center;color:inherit">⬅️</a><button class="b" data-m="build">🔧<small>1 Montar</small></button><button class="b off" data-m="ctl">🕹️<small>2 Controlar</small></button><button class="b off" data-m="prog">🧩<small>3 Programar</small></button><button class="b" id="rs">↺</button></nav>
 <div id="st"><canvas id="cv"></canvas><div id="cap"></div></div>
 <div id="pn"></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="three.min.js"></script>
 <script>
 let L1=1.4,LF=1.3;const H=.7,R=1.7,D=Math.PI/180,$=s=>document.querySelector(s);
 const S={yaw:0,a1:0,a2:0,g:0};
@@ -81,12 +81,12 @@ hold('↶<small>Base</small>','yaw',1.5);hold('↷<small>Base</small>','yaw',-1.
 mk('✊<small>Fechar</small>',()=>grip(1));mk('✋<small>Abrir</small>',()=>grip(0));mk('🏠<small>Home</small>',()=>ops.H());mk('📥<small>Caixa</small>',()=>ops.P())}
 let prog=[];
 function rt(){const t=$('#tr');if(!t)return;t.innerHTML='';prog.forEach((b,i)=>{const c=document.createElement('button');c.className='b'+(i==cur?' on':'');c.innerHTML=b.k=='r'?'🔁'+b.n:b.k=='e'?'🔚':ic[b.k];c.onclick=()=>{if(!running){prog.splice(i,1);rt()}};t.appendChild(c)})}
-function progUI(){say('Missão: leve os 3 cubos para a caixa verde!');
+function progUI(){say('Missão: leve os 3 cubos para a caixa verde! 🔁 repete só o bloco anterior.');
 const t=document.createElement('div');t.id='tr';pn.appendChild(t);
 [['L','Esq.'],['R','Dir.'],['D','Descer'],['U','Subir'],['C','Fechar'],['O','Abrir'],['H','Home'],['P','Caixa']].forEach(([k,l])=>mk(ic[k]+'<small>'+l+'</small>',()=>{prog.push({k});rt()}));
-[2,3,4].forEach(n=>mk('🔁'+n+'<small>Repetir</small>',()=>{prog.push({k:'r',n});rt()}));mk('🔚<small>Fim</small>',()=>{prog.push({k:'e'});rt()});
+[2,3,4].forEach(n=>mk('🔁'+n+'<small>Repetir anterior</small>',()=>{prog.push({k:'r',n});rt()}));mk('⌫<small>Apagar último</small>',()=>{if(!running){prog.pop();rt()}});
 mk('▶️<small>Executar</small>',run,'pulse');mk('⏹<small>Parar</small>',()=>stop=true);mk('🗑<small>Limpar</small>',()=>{if(!running){prog=[];rt()}});rt()}
-function expand(){const st=[{a:[],n:1}],pop=()=>{const t=st.pop();for(let j=0;j<t.n;j++)st[st.length-1].a.push(...t.a)};prog.forEach((b,i)=>{if(b.k=='r')st.push({a:[],n:b.n});else if(b.k=='e'){if(st.length>1)pop()}else st[st.length-1].a.push({o:b.k,i})});while(st.length>1)pop();return st[0].a.slice(0,400)}
+function expand(){const o=[];let l=null;prog.forEach((b,i)=>{if(b.k=='r'){if(l)for(let j=0;j<b.n;j++)o.push({o:l,i})}else{l=b.k;o.push({o:b.k,i})}});return o.slice(0,400)}
 async function run(){if(running)return;running=true;stop=false;for(const s of expand()){if(stop)break;cur=s.i;rt();await ops[s.o]()}cur=-1;rt();running=false}
 document.querySelectorAll('nav [data-m]').forEach(b=>b.onclick=()=>{if(!running)show(b.dataset.m)});
 $('#rs').onclick=()=>{if(!running){resetScene()}};
